@@ -64,7 +64,7 @@ size_t write(int fd, const void* buf, size_t count)
 
 int RunningOnValgrind(void)
 {
-    return NULL;
+    return 0;
 }
 
 char* getenv(const char* name)
@@ -101,7 +101,7 @@ static void _acquire_lock(uint32_t* spinlock)
     }
 }
 
-static void _release_unlock(uint32_t* spinlock)
+static void _release_lock(uint32_t* spinlock)
 {
     asm volatile("movl %0, %1;"
                  :
