@@ -683,7 +683,8 @@ extern "C" int MallocHook_GetCallerStackTrace(void** result, int max_depth,
 // of course, to doing what these functions normally do).
 
 #if defined(__linux)
-# include "malloc_hook_mmap_linux.h"
+// SGX Enclaves do not support mmap
+// # include "malloc_hook_mmap_linux.h"
 
 #elif defined(__FreeBSD__)
 # include "malloc_hook_mmap_freebsd.h"
