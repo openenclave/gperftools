@@ -35,6 +35,7 @@
 // Based on
 // https://github.com/intel/linux-sgx/blob/master/sdk/gperftools/gperftools-2.7/src/base/sgx_utils.cc
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -72,3 +73,75 @@ char* getenv(const char* name)
     return NULL;
 }
 
+
+/* Set the spinlock value to 1 and return the old value */
+static unsigned int _spin_set_locked(uint32_t* spinlock)
+{
+    uint32_t value = 1;
+
+    asm volatile("lock xchg %0, %1;"
+                 : "=r"(value)     /* %0 */
+                 : "m"(*spinlock), /* %1 */
+                   "0"(value)      /* also %2 */
+                 : "memory");
+
+    return value;
+}
+
+static void _acquire_lock(uint32_t* spinlock)
+{
+    while (_spin_set_locked(spinlock) != 0)
+    {
+        /* Spin while waiting for spinlock to be released (become 1) */
+        while (*spinlock)
+        {
+            /* Yield to CPU */
+            asm volatile("pause");
+        }
+    }
+}
+
+static void _release_unlock(uint32_t* spinlock)
+{
+    asm volatile("movl %0, %1;"
+                 :
+                 : "r"(0), "m"(*spinlock) /* %1 */
+                 : "memory");
+}
+
+
+static uint8_t* _heap_start;
+static uint8_t* _heap_end;
+static uint8_t* _heap_next;
+static uint32_t  _lock = 0;
+
+void* sbrk(ptrdiff_t increment)
+{
+    void* ptr = (void*)-1;
+
+    _acquire_lock(&_lock);
+    {
+	ptrdiff_t remaining;
+
+	if (!_heap_next)
+	    _heap_next = _heap_start;
+
+	remaining = _heap_end - _heap_next;
+
+	if (increment <= remaining)
+	{
+	    ptr = _heap_next;
+	    _heap_next += increment;
+	}
+    }
+    _release_lock(&_lock);
+
+    return ptr;
+}
+
+void tcmalloc_set_enclave_heap_range(uint8_t* heap_start,
+				     uint8_t* heap_end)
+{
+    _heap_start = heap_start;
+    _heap_end = heap_end;
+}
