@@ -56,6 +56,9 @@
 using STL_NAMESPACE::string;
 using STL_NAMESPACE::vector;
 
+// Open Enclave.
+// DumpAddressMap is not used.
+#if 0
 static void DumpAddressMap(string* result) {
   *result += "\nMAPPED_LIBRARIES:\n";
   // We keep doubling until we get a fit
@@ -74,6 +77,7 @@ static void DumpAddressMap(string* result) {
   }
   result->reserve(old_resultlen);   // just don't print anything
 }
+#endif
 
 // Note: this routine is meant to be called before threads are spawned.
 void MallocExtension::Initialize() {
@@ -298,6 +302,9 @@ void PrintStackEntry(MallocExtensionWriter* writer, void** entry) {
 }
 
 void MallocExtension::GetHeapSample(MallocExtensionWriter* writer) {
+// Open Enclave
+// Unsupported.
+#if 0
   int sample_period = 0;
   void** entries = ReadStackTraces(&sample_period);
   if (entries == NULL) {
@@ -319,9 +326,13 @@ void MallocExtension::GetHeapSample(MallocExtensionWriter* writer) {
   delete[] entries;
 
   DumpAddressMap(writer);
+#endif
 }
 
 void MallocExtension::GetHeapGrowthStacks(MallocExtensionWriter* writer) {
+// Open Enclave
+// Unsupported.
+#if 0
   void** entries = ReadHeapGrowthStackTraces();
   if (entries == NULL) {
     const char* const kErrorMsg =
@@ -343,6 +354,7 @@ void MallocExtension::GetHeapGrowthStacks(MallocExtensionWriter* writer) {
   delete[] entries;
 
   DumpAddressMap(writer);
+#endif
 }
 
 void MallocExtension::Ranges(void* arg, RangeFunction func) {
