@@ -87,7 +87,9 @@ Atomic32 SpinLock::SpinLoop() {
 void SpinLock::SlowLock() {
   Atomic32 lock_value = SpinLoop();
 
-  int lock_wait_call_count = 0;
+  // Open Enclave
+  // lock_wait_call_count is not used.
+  // int lock_wait_call_count = 0;
   while (lock_value != kSpinLockFree) {
     // If the lock is currently held, but not marked as having a sleeper, mark
     // it as having a sleeper.
@@ -114,9 +116,11 @@ void SpinLock::SlowLock() {
       }
     }
 
+    // Open Enclave.
+    // SpinLockDelay is not applicable.
     // Wait for an OS specific delay.
-    base::internal::SpinLockDelay(&lockword_, lock_value,
-                                  ++lock_wait_call_count);
+    //base::internal::SpinLockDelay(&lockword_, lock_value,
+    //                              ++lock_wait_call_count);
     // Spin again after returning from the wait routine to give this thread
     // some chance of obtaining the lock.
     lock_value = SpinLoop();
@@ -124,6 +128,7 @@ void SpinLock::SlowLock() {
 }
 
 void SpinLock::SlowUnlock() {
+  // Open Enclave SpinLockWake is not used.
   // wake waiter if necessary
-  base::internal::SpinLockWake(&lockword_, false);
+  // base::internal::SpinLockWake(&lockword_, false);
 }
