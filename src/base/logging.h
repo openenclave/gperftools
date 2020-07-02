@@ -226,7 +226,9 @@ inline void LogPrintf(int severity, const char* pat, va_list ap) {
 
 // RAW_LOG is the main function; some synonyms are used in unittests.
 inline void RAW_LOG(int lvl, const char* pat, ...)  { LOG_PRINTF(lvl, pat); }
-inline void RAW_VLOG(int lvl, const char* pat, ...) { LOG_PRINTF(lvl, pat); }
+// Open Enclave
+// Comment out logging.
+inline void RAW_VLOG(int lvl, const char* pat, ...) { }
 inline void LOG(int lvl, const char* pat, ...)      { LOG_PRINTF(lvl, pat); }
 inline void VLOG(int lvl, const char* pat, ...)     { LOG_PRINTF(lvl, pat); }
 inline void LOG_IF(int lvl, bool cond, const char* pat, ...) {
